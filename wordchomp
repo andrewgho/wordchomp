@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+# wordchomp - given set of letters, generate sets of words that use them all
+# Andrew Ho (andrew@zeuscat.com)
+
+require 'multimap'
+
+ME = File.basename(__FILE__)
+USAGE = "usage: #{ME} letters"
+
+# Given set of letters, generate set partitions, look for matches in dictionary
+def main(argv = ARGV)
+  retval = 1   # program exit status, 0 means success
+  if argv.empty?
+    $stderr.puts USAGE
+  else
+    word = argv.join.strip
+    letters = word.upcase.split(//).select { |c| is_upcase_letter?(c) }
+    dict = AnagramDictionary.new
+    partitions(letters) do |partition|
+      candidates = partition.collect { |letters| dict.lookup(letters.join) }
+      if candidates.all? { |words| !words.empty? }
+        puts candidates.collect { |words| words.join(' ') }.join(' | ')
+        retval = 0
+      end
+    end
+  end
+  retval
+end
+
+# Returns true if input character is an uppercase English alphabet letter
+def is_upcase_letter?(c)
+  c >= 'A' && c <= 'Z'
+end
+
+# Given a word, return any dictionary words that are anagrams for that word
+class AnagramDictionary
+  MINIMUM_SIZE = 4  # only return solutions with this many letters
+  DEFAULT_FILENAME = File.join(File.dirname(__FILE__), 'ospd3.txt')
+  def initialize(filename = DEFAULT_FILENAME)
+    @dict = Multimap.new
+    File.open(filename).each do |word|
+      word.strip!
+      k = key(word)
+      @dict[k] = word if k.size > MINIMUM_SIZE
+    end
+  end
+  def lookup(word)
+    @dict[key(word)]
+  end
+  private
+  def key(word)
+    word.upcase.split(//).select { |c| is_upcase_letter?(c) }.sort.join
+  end
+end
+
+# Given an array, return its set partition (http://stackoverflow.com/a/2037581)
+def partitions(set)
+  yield [] if set.empty?
+  (0 ... 2 ** set.size / 2).each do |i|
+    parts = [[], []]
+    set.each do |item|
+      parts[i & 1] << item
+      i >>= 1
+    end
+    partitions(parts[1]) do |b|
+      result = [parts[0]] + b
+      result = result.reject { |e| e.empty? }
+      yield result
+    end
+  end
+end
+
+# Run main loop and exit with success if any solutions were found
+exit main ARGV
