@@ -1,0 +1,11 @@
+Given a set of letters, print out all the ways those letters can be
+combined into a set of words which use up all the letters.
+
+Given a word dictionary, sort the letters in each word, and add an entry
+to a disk-based multi-map that maps the sorted letters to the word.
+
+Given the set of letters, generate the partition of the set: the
+division of that set into sets of non-overlapping, non-empty subsets
+that together contain all elements from the set. For each of these sets,
+sort the letters in each subset, then look up the words that map to
+them. If all subsets map to one or more words, then print them out.
