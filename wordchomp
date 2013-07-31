@@ -14,9 +14,8 @@ def main(argv = ARGV)
     $stderr.puts USAGE
   else
     word = argv.join.strip
-    letters = word.upcase.split(//).select { |c| is_upcase_letter?(c) }
     dict = AnagramDictionary.new
-    partitions(letters) do |partition|
+    partitions(word.upcase_letters) do |partition|
       candidates = partition.collect { |letters| dict.lookup(letters.join) }
       if candidates.all? { |words| !words.empty? }
         puts candidates.collect { |words| words.join(' ') }.join(' | ')
@@ -27,9 +26,11 @@ def main(argv = ARGV)
   retval
 end
 
-# Returns true if input character is an uppercase English alphabet letter
-def is_upcase_letter?(c)
-  c >= 'A' && c <= 'Z'
+# Return uppercased letters from a string
+class String
+  def upcase_letters
+    self.upcase.split(//).select { |c| c >= 'A' && c <= 'Z' }
+  end
 end
 
 # Given a word, return any dictionary words that are anagrams for that word
@@ -57,7 +58,7 @@ class AnagramDictionary
 
   # Normalize word to uppercase letters only
   def key(word)
-    word.upcase.split(//).select { |c| is_upcase_letter?(c) }.sort.join
+    word.upcase_letters.sort.join
   end
 end
 
