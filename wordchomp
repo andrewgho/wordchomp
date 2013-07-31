@@ -15,7 +15,7 @@ def main(argv = ARGV)
   else
     word = argv.join.strip
     dict = AnagramDictionary.new
-    partitions(word.upcase_letters) do |partition|
+    word.upcase_letters.partitions do |partition|
       candidates = partition.collect { |letters| dict.lookup(letters.join) }
       if candidates.all? { |words| !words.empty? }
         puts candidates.collect { |words| words.join(' ') }.join(' | ')
@@ -24,13 +24,6 @@ def main(argv = ARGV)
     end
   end
   retval
-end
-
-# Return uppercased letters from a string
-class String
-  def upcase_letters
-    self.upcase.split(//).select { |c| c >= 'A' && c <= 'Z' }
-  end
 end
 
 # Given a word, return any dictionary words that are anagrams for that word
@@ -46,7 +39,7 @@ class AnagramDictionary
     File.open(filename).each do |word|
       word.strip!
       k = key(word)
-      @dict[k] = word if k.size > MINIMUM_SIZE
+      @dict[k] = word if k.size >= MINIMUM_SIZE
     end
   end
 
@@ -62,19 +55,28 @@ class AnagramDictionary
   end
 end
 
-# Given an array, return its set partition (http://stackoverflow.com/a/2037581)
-def partitions(set)
-  yield [] if set.empty?
-  (0 ... 2 ** set.size / 2).each do |i|
-    parts = [[], []]
-    set.each do |item|
-      parts[i & 1] << item
-      i >>= 1
-    end
-    partitions(parts[1]) do |b|
-      result = [parts[0]] + b
-      result = result.reject { |e| e.empty? }
-      yield result
+# Return uppercased letters from a string
+class String
+  def upcase_letters
+    self.upcase.split(//).select { |c| c >= 'A' && c <= 'Z' }
+  end
+end
+
+# Return set partition from an array (http://stackoverflow.com/a/2037581)
+class Array
+  def partitions
+    yield [] if self.empty?
+    (0 ... 2 ** self.size / 2).each do |i|
+      parts = [[], []]
+      self.each do |item|
+        parts[i & 1] << item
+        i >>= 1
+      end
+      parts[1].partitions do |b|
+        result = [parts[0]] + b
+        result = result.reject { |e| e.empty? }
+        yield result
+      end
     end
   end
 end
