@@ -9,7 +9,7 @@ USAGE = "usage: #{ME} letters"
 
 # Given set of letters, generate set partitions, look for matches in dictionary
 def main(argv = ARGV)
-  retval = 1   # program exit status, 0 means success
+  retval = 1   # Program exit status; zero means success, non-zero means error
   if argv.empty?
     $stderr.puts USAGE
   else
