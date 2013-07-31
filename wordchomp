@@ -7,14 +7,14 @@ require 'multimap'
 ME = File.basename(__FILE__)
 USAGE = "usage: #{ME} letters"
 
-# Given set of letters, generate set partitions, look for matches in dictionary
+# Given set of letters, generate set partition, look for matches in dictionary
 def main(argv = ARGV)
   retval = 1   # Program exit status; zero means success, non-zero means error
   if argv.empty?
     $stderr.puts USAGE
   else
-    word = argv.join.strip
     dict = AnagramDictionary.new
+    word = argv.join.strip
     word.upcase_letters.partitions do |partition|
       candidates = partition.collect { |letters| dict.lookup(letters.join) }
       if candidates.all? { |words| !words.empty? }
@@ -49,20 +49,22 @@ class AnagramDictionary
 
   private
 
-  # Normalize word to uppercase letters only
+  # Normalize word to an anagram hash key of sorted uppercase letters
   def key(word)
     word.upcase_letters.sort.join
   end
 end
 
-# Return uppercased letters from a string
+# Split a string into uppercase letters only
 class String
   def upcase_letters
     self.upcase.split(//).select { |c| c >= 'A' && c <= 'Z' }
   end
 end
 
-# Return set partition from an array (http://stackoverflow.com/a/2037581)
+# Return the partition of the set represented by an array
+# (http://en.wikipedia.org/wiki/Partition_of_a_set)
+# (http://stackoverflow.com/a/2037581)
 class Array
   def partitions
     yield [] if self.empty?
