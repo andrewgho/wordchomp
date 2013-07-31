@@ -28,18 +28,19 @@ end
 
 # Given a word, return any dictionary words that are anagrams for that word
 class AnagramDictionary
-  # Only return solutions with this many letters
-  MINIMUM_SIZE = 4
+  # Only return words with at least this many letters
+  MINIMUM_WORD_SIZE = 4
 
-  # OSPD3 from http://www.calvin.edu/~rpruim/scrabble/ospd3.txt
-  DEFAULT_FILENAME = File.join(File.dirname(__FILE__), 'ospd3.txt')
+  # Official Scrabble Player's Dictionary, version 3
+  # (http://www.calvin.edu/~rpruim/scrabble/ospd3.txt)
+  DEFAULT_DICTIONARY_FILENAME = File.join(File.dirname(__FILE__), 'ospd3.txt')
 
-  def initialize(filename = DEFAULT_FILENAME)
+  def initialize(filename = DEFAULT_DICTIONARY_FILENAME)
     @dict = Multimap.new
     File.open(filename).each do |word|
       word.strip!
       k = key(word)
-      @dict[k] = word if k.size >= MINIMUM_SIZE
+      @dict[k] = word if k.size >= MINIMUM_WORD_SIZE
     end
   end
 
