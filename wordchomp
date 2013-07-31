@@ -34,8 +34,12 @@ end
 
 # Given a word, return any dictionary words that are anagrams for that word
 class AnagramDictionary
-  MINIMUM_SIZE = 4  # only return solutions with this many letters
+  # Only return solutions with this many letters
+  MINIMUM_SIZE = 4
+
+  # OSPD3 from http://www.calvin.edu/~rpruim/scrabble/ospd3.txt
   DEFAULT_FILENAME = File.join(File.dirname(__FILE__), 'ospd3.txt')
+
   def initialize(filename = DEFAULT_FILENAME)
     @dict = Multimap.new
     File.open(filename).each do |word|
@@ -44,10 +48,14 @@ class AnagramDictionary
       @dict[k] = word if k.size > MINIMUM_SIZE
     end
   end
+
   def lookup(word)
     @dict[key(word)]
   end
+
   private
+
+  # Normalize word to uppercase letters only
   def key(word)
     word.upcase.split(//).select { |c| is_upcase_letter?(c) }.sort.join
   end
